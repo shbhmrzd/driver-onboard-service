@@ -1,11 +1,13 @@
 package com.example.driveronboardservice.model;
 
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BackgroundCheckRequest {
-    private Long driverId;
-    private boolean passed;
+@Data
+public class BackgroundCheckDTO {
+    private Long id;
+    private String status;
     private String comments;
 
     // Constructors, getters, and setters

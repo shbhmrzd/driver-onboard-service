@@ -18,9 +18,6 @@ import java.io.IOException;
 @RequestMapping("/document")
 public class DocumentController {
 
-    @Autowired
-    private ModelMapper modelMapper;
-
     private DocumentService documentService;
     private DriverService driverService;
 
@@ -42,6 +39,9 @@ public class DocumentController {
         document.setFile(byteArr);
         document.setType("License");
         Document documentCreated = documentService.uploadDocument(document);
+        driver.setLicense(documentCreated);
+        driverService.updateDriver(driverId, driver);
+
         DocumentUploadResponse  documentUploadResponse = new DocumentUploadResponse();
         documentUploadResponse.setId(documentCreated.getId());
         documentUploadResponse.setStatus("Uploaded");

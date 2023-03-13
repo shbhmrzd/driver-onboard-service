@@ -1,7 +1,12 @@
 package com.example.driveronboardservice.service;
 
-import org.springframework.stereotype.Service;
+import com.example.driveronboardservice.model.BackgroundCheck;
 
-@Service
-public class BackgroundCheckService {
+public interface BackgroundCheckService {
+
+    BackgroundCheck initiateCheck(BackgroundCheck backgroundCheck);
+
+    BackgroundCheck markVerified(long id);
+
+    BackgroundCheck getById(long id);
 }

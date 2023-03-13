@@ -48,6 +48,12 @@ public class DriverController {
         Driver driver = driverService.getDriverById(driverId);
         if(driver != null){
             DriverResponse driverResponse = modelMapper.map(driver, DriverResponse.class);
+            if(driver.getLicense()!=null){
+                driverResponse.setDocumentId(driver.getLicense().getId());
+            }
+            if(driver.getBackgroundCheck()!=null){
+                driverResponse.setBackgroundCheckStatus(driver.getBackgroundCheck().getStatus());
+            }
             return ResponseEntity.ok().body(driverResponse);
         }else{
             return new ResponseEntity<DriverResponse>(HttpStatus.NOT_FOUND);

@@ -11,10 +11,11 @@ public class DriverResponse {
     private String name;
     private String phone;
     private String email;
+    private Long documentId;
 
-    private Document license;
-    private TrackingDevice trackingDevice;
-    private BackgroundCheck backgroundCheck;
+//    private Document license;
+    private String trackingDeviceStatus;
+    private String backgroundCheckStatus;
 
     private String vehicleMake;
     private String vehicleModel;
