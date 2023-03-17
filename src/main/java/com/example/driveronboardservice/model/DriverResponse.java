@@ -11,7 +11,9 @@ public class DriverResponse {
     private String name;
     private String phone;
     private String email;
+    private String address;
     private Long documentId;
+    private boolean isEligibleForRides;
 
 //    private Document license;
     private String trackingDeviceStatus;

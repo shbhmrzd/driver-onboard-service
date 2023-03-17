@@ -6,7 +6,7 @@ public interface BackgroundCheckService {
 
     BackgroundCheck initiateCheck(BackgroundCheck backgroundCheck);
 
-    BackgroundCheck markVerified(long id);
+    BackgroundCheck markStatus(long id, String status, String comment);
 
     BackgroundCheck getById(long id);
 }

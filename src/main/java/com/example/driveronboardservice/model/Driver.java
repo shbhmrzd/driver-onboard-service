@@ -14,8 +14,11 @@ import javax.persistence.*;
 @Table(name = "Driver")
 public class Driver {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Column(name="username", unique=true)
+    private String username;
+
     private String name;
 
     @Column(name="phone", unique=true)
@@ -23,6 +26,10 @@ public class Driver {
 
     @Column(name="email", unique=true)
     private String email;
+
+    private String address;
+
+    private boolean isEligibleForRides = false;
 
     @OneToOne
     @JoinColumn(name = "fk_license_id")

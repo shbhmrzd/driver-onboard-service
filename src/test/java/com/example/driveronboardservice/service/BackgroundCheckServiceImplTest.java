@@ -46,9 +46,10 @@ public class BackgroundCheckServiceImplTest {
         when(backgroundCheckRepository.findById(1L)).thenReturn(java.util.Optional.of(backgroundCheck));
         when(backgroundCheckRepository.save(backgroundCheck)).thenReturn(backgroundCheck);
 
-        BackgroundCheck verifiedBackgroundCheck = backgroundCheckService.markVerified(1L);
+        BackgroundCheck verifiedBackgroundCheck = backgroundCheckService.markStatus(1L, "verified", "na");
 
         assertEquals(verifiedBackgroundCheck.getStatus(), "verified");
+        assertEquals(verifiedBackgroundCheck.getComments(), "na");
         verify(backgroundCheckRepository, times(1)).findById(1L);
         verify(backgroundCheckRepository, times(1)).save(backgroundCheck);
     }

@@ -3,83 +3,97 @@ package com.example.driveronboardservice.controller;
 import com.example.driveronboardservice.model.Driver;
 import com.example.driveronboardservice.model.DriverSignupRequest;
 import com.example.driveronboardservice.model.DriverResponse;
+import com.example.driveronboardservice.model.User;
 import com.example.driveronboardservice.service.DriverService;
+import com.example.driveronboardservice.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/drivers")
 @Api(value = "Driver Management System", description = "Operations pertaining to driver in Driver Management System")
 public class DriverController {
     @Autowired
     private ModelMapper modelMapper;
 
-    private DriverService driverService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    public DriverController(DriverService driverService) {
+    private DriverService driverService;
+    private UserService userService;
+
+    public DriverController(DriverService driverService, UserService userService) {
         super();
         this.driverService = driverService;
+        this.userService = userService;
     }
 
+    @Transactional
     @PostMapping("/signup")
     @ApiOperation(value = "Sign up as a new driver")
-    public ResponseEntity<DriverResponse> signUp(@RequestBody DriverSignupRequest driverRequest) {
+    public ResponseEntity signUp(@RequestBody DriverSignupRequest driverRequest) {
 
-        // convert DTO to entity
+        User user = new User();
+        user.setUsername(driverRequest.getUsername());
+        user.setPassword(passwordEncoder.encode(driverRequest.getPassword()));
+        user.setActive(true);
+
+        User userCreated = userService.createUser(user);
         Driver driver = modelMapper.map(driverRequest, Driver.class);
+        driver.setId(userCreated.getId());
 
         Driver driverCreated = driverService.createDriver(driver);
 
-        // convert entity to DTO
         DriverResponse driverResponse = modelMapper.map(driverCreated, DriverResponse.class);
 
         return new ResponseEntity<DriverResponse>(driverResponse, HttpStatus.CREATED);
+
     }
 
-    @GetMapping("/{id}")
-    @ApiOperation(value = "Get a driver by ID")
-    public ResponseEntity<DriverResponse> getDriverById(@PathVariable(value = "id") Long driverId) {
+    @GetMapping("/driver/{username}")
+    @ApiOperation(value = "Get a driver by username")
+    public ResponseEntity<DriverResponse> getDriverByUsername(@PathVariable(value = "username") String username) {
 
-        Driver driver = driverService.getDriverById(driverId);
-        if(driver != null){
-            DriverResponse driverResponse = modelMapper.map(driver, DriverResponse.class);
-            if(driver.getLicense()!=null){
-                driverResponse.setDocumentId(driver.getLicense().getId());
-            }
-            if(driver.getBackgroundCheck()!=null){
-                driverResponse.setBackgroundCheckStatus(driver.getBackgroundCheck().getStatus());
-            }
-            return ResponseEntity.ok().body(driverResponse);
-        }else{
-            return new ResponseEntity<DriverResponse>(HttpStatus.NOT_FOUND);
+        Driver driver = driverService.getDriverByUsername(username);
+        DriverResponse driverResponse = modelMapper.map(driver, DriverResponse.class);
+        if(driver.getLicense()!=null){
+            driverResponse.setDocumentId(driver.getLicense().getId());
+        }
+        if(driver.getBackgroundCheck()!=null){
+            driverResponse.setBackgroundCheckStatus(driver.getBackgroundCheck().getStatus());
         }
 
+        return new ResponseEntity<DriverResponse>(driverResponse, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    @ApiOperation(value = "Update a driver by ID")
-    public ResponseEntity<DriverResponse> getDriverById(@RequestBody Driver  driver, @PathVariable(value = "id") Long driverId) {
-        if(driver.getId() != driverId){
-            return new ResponseEntity<DriverResponse>(HttpStatus.BAD_REQUEST);
+    @PutMapping("/driver/{username}")
+    @ApiOperation(value = "Update a driver by username")
+    public ResponseEntity<DriverResponse> updateDriverByUsername(@RequestBody DriverSignupRequest  driverSignupRequest, @PathVariable(value = "username") String username) {
+        if(!driverSignupRequest.getUsername().equals(username)){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        Driver driverUpdated = driverService.updateDriver(driverId, driver);
-        if(driverUpdated != null){
-            DriverResponse driverResponse = modelMapper.map(driverUpdated, DriverResponse.class);
-            return ResponseEntity.ok().body(driverResponse);
-        }else{
-            return new ResponseEntity<DriverResponse>(HttpStatus.NOT_FOUND);
-        }
+
+        Driver driver = modelMapper.map(driverSignupRequest, Driver.class);
+        Driver driverUpdated = driverService.updateDriver(username, driver);
+        DriverResponse driverResponse = modelMapper.map(driverUpdated, DriverResponse.class);
+        return ResponseEntity.ok().body(driverResponse);
     }
 
-    @GetMapping("/hello")
-    @ApiOperation(value = "Get a simple hello")
-    public ResponseEntity<String> getGreeting() {
-        return ResponseEntity.ok().body("driver");
+    @PatchMapping("/driver/{username}")
+    @ApiOperation(value = "Update driver ready to take rides")
+    public ResponseEntity<DriverResponse> updateDriverReadyForRides(@RequestParam(value = "isReady") Boolean isReady, @PathVariable(value = "username") String username) {
+
+        Driver driverUpdated = driverService.updateIsReadyForRides(username, isReady);
+        DriverResponse driverResponse = modelMapper.map(driverUpdated, DriverResponse.class);
+        return ResponseEntity.ok().body(driverResponse);
     }
+
 
 }

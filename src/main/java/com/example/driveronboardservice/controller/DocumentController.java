@@ -1,5 +1,6 @@
 package com.example.driveronboardservice.controller;
 
+import com.example.driveronboardservice.exception.OperationNotPermitted;
 import com.example.driveronboardservice.model.*;
 import com.example.driveronboardservice.service.DocumentService;
 import com.example.driveronboardservice.service.DriverService;
@@ -29,33 +30,35 @@ public class DocumentController {
 
     @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
     @ApiOperation(value = "Upload a document")
-    public ResponseEntity<DocumentUploadResponse> upload(@RequestParam(value = "file") MultipartFile file, @RequestParam(value = "driverId") Long driverId)
-            throws IOException{
+    public ResponseEntity<DocumentUploadResponse> upload(@RequestParam(value = "file") MultipartFile file, @RequestParam(value = "username") String username) throws IOException {
 
         byte [] byteArr=file.getBytes();
-        Driver driver = driverService.getDriverById(driverId);
+        Driver driver = driverService.getDriverByUsername(username);
         Document document = new Document();
         document.setDriver(driver);
         document.setFile(byteArr);
         document.setType("License");
         Document documentCreated = documentService.uploadDocument(document);
         driver.setLicense(documentCreated);
-        driverService.updateDriver(driverId, driver);
+        driverService.updateDriver(username, driver);
 
         DocumentUploadResponse  documentUploadResponse = new DocumentUploadResponse();
         documentUploadResponse.setId(documentCreated.getId());
         documentUploadResponse.setStatus("Uploaded");
+
         return new ResponseEntity<DocumentUploadResponse>(documentUploadResponse,  HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{username}/{id}")
     @ApiOperation(value = "Get a document by ID")
-    public ResponseEntity<Resource> getDocumentById(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<Resource> getDocumentById(@PathVariable(value = "id") Long id, @PathVariable(value = "username") String username) {
 
-        Document document = documentService.getDocumentById(id);
-        if(document == null){
-            return ResponseEntity.notFound().build();
+        Driver driver = driverService.getDriverByUsername(username);
+        if(driver.getLicense() == null || driver.getLicense().getId() != id){
+            throw new OperationNotPermitted("No such document for the driver : " + username);
         }
+        Document document = documentService.getDocumentById(id);
+
         byte[] array = document.getFile();
 
         ByteArrayResource resource = new ByteArrayResource(array);

@@ -1,9 +1,8 @@
 package com.example.driveronboardservice.service;
 
+import com.example.driveronboardservice.exception.DataNotFoundException;
 import com.example.driveronboardservice.model.BackgroundCheck;
-import com.example.driveronboardservice.model.Driver;
 import com.example.driveronboardservice.repository.BackgroundCheckRepository;
-import com.example.driveronboardservice.repository.DriverRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,17 +21,22 @@ public class BackgroundCheckServiceImpl implements BackgroundCheckService {
     }
 
     @Override
-    public BackgroundCheck markVerified(long id) {
+    public BackgroundCheck markStatus(long id, String status, String comment) {
         BackgroundCheck backgroundCheck = backgroundCheckRepository.findById(id).orElse(null);
-        if(backgroundCheck != null){
-            backgroundCheck.setStatus("verified");
-            return backgroundCheckRepository.save(backgroundCheck);
+        if(backgroundCheck == null){
+            throw new DataNotFoundException("No background check job found for id : " + id);
         }
-        return null;
+        backgroundCheck.setStatus(status);
+        backgroundCheck.setComments(comment);
+        return backgroundCheckRepository.save(backgroundCheck);
     }
 
     @Override
     public BackgroundCheck getById(long id) {
-        return backgroundCheckRepository.findById(id).orElse(null);
+        BackgroundCheck backgroundCheck =  backgroundCheckRepository.findById(id).orElse(null);
+        if(backgroundCheck == null){
+            throw new DataNotFoundException("No background check job found for id : " + id);
+        }
+            return backgroundCheck;
     }
 }

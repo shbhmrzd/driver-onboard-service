@@ -28,19 +28,16 @@ public class BackgroundCheckController {
 
     @PostMapping("/initiate")
     @ApiOperation(value = "Initiate background verification for driver")
-    public ResponseEntity<BackgroundCheckDTO> initiateCheck(@RequestParam("driverId") Long driverId) {
+    public ResponseEntity<BackgroundCheckDTO> initiateCheck(@RequestParam("username") String username) {
 
-        Driver driver = driverService.getDriverById(driverId);
+        Driver driver = driverService.getDriverByUsername(username);
         BackgroundCheck backgroundCheck = new BackgroundCheck();
         backgroundCheck.setDriver(driver);
         backgroundCheck.setStatus("initiated");
 
-
-
         BackgroundCheck backgroundCheckCreated = backgroundCheckService.initiateCheck(backgroundCheck);
-
         driver.setBackgroundCheck(backgroundCheckCreated);
-        driverService.updateDriver(driverId, driver);
+        driverService.updateDriver(username, driver);
 
         // convert entity to DTO
         BackgroundCheckDTO backgroundCheckDTO = modelMapper.map(backgroundCheckCreated, BackgroundCheckDTO.class);
@@ -53,27 +50,17 @@ public class BackgroundCheckController {
     public ResponseEntity<BackgroundCheckDTO> getBackgroundCheckById(@PathVariable(value = "id") Long id) {
 
         BackgroundCheck backgroundCheck = backgroundCheckService.getById(id);
-        if(backgroundCheck != null){
-            BackgroundCheckDTO backgroundCheckDTO = modelMapper.map(backgroundCheck, BackgroundCheckDTO.class);
-            return ResponseEntity.ok().body(backgroundCheckDTO);
-        }else{
-            return new ResponseEntity<BackgroundCheckDTO>(HttpStatus.NOT_FOUND);
-        }
-
+        BackgroundCheckDTO backgroundCheckDTO = modelMapper.map(backgroundCheck, BackgroundCheckDTO.class);
+        return ResponseEntity.ok().body(backgroundCheckDTO);
     }
 
-    @GetMapping("/{id}/verified")
-    @ApiOperation(value = "Mark the background check as verified by ID")
-    public ResponseEntity<BackgroundCheckDTO> markVerified( @PathVariable(value = "id") Long id) {
+    @PatchMapping("/{id}")
+    @ApiOperation(value = "Mark the background check as verified or failed by ID")
+    public ResponseEntity<BackgroundCheckDTO> markStatus( @PathVariable(value = "id") Long id, @RequestBody BackgroundCheckDTO  backgroundCheckDTO) {
 
-        BackgroundCheck backgroundCheck = backgroundCheckService.markVerified(id);
-        if(backgroundCheck != null){
-            BackgroundCheckDTO backgroundCheckDTO = modelMapper.map(backgroundCheck, BackgroundCheckDTO.class);
-            return ResponseEntity.ok().body(backgroundCheckDTO);
-        }else{
-            return new ResponseEntity<BackgroundCheckDTO>(HttpStatus.NOT_FOUND);
-        }
+        BackgroundCheck backgroundCheck = backgroundCheckService.markStatus(id, backgroundCheckDTO.getStatus(), backgroundCheckDTO.getComments());
+        BackgroundCheckDTO backgroundCheckDTOResponse = modelMapper.map(backgroundCheck, BackgroundCheckDTO.class);
+        return ResponseEntity.ok().body(backgroundCheckDTOResponse);
     }
-
 
 }
