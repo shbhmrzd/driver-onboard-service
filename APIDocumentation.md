@@ -6,6 +6,8 @@ This API documentation covers all the available endpoints of the Driver Onboard 
 
 The base URL for all the endpoints is `http://localhost:8080`.
 
+Api doc is available at `http://localhost:8080/v2/api-docs`
+
 ## Endpoints
 
 ### Driver Controller :  /driver
