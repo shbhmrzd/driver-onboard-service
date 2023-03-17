@@ -1,27 +1,11 @@
-Sign-up API: This API interface will allow a driver to sign-up and enter their profile information. It will receive data in the form of JSON or XML and will return a response indicating whether the sign-up was successful or not.
+#System Design
+https://lucid.app/lucidchart/2aa8ae5f-9bf5-4cba-b0d9-8d51b92d7582/edit?viewport_loc=-652%2C-1232%2C2368%2C1252%2C0_0&invitationId=inv_1428eee7-c2a6-436b-84e3-f400ab8b716c
 
-Document Collection API: This API interface will be responsible for triggering the document collection process. It will receive the driver's identification documents and upload them to the server. The API will also validate the documents before the submission.
+#Sequence Diagram 
+https://lucid.app/lucidchart/2dd47e18-c152-4148-b73b-e0156948f395/edit?viewport_loc=-189%2C-452%2C1711%2C905%2C0_0&invitationId=inv_50beea29-63f8-43a0-8a80-17ddb45de941
 
-Background Verification API: This API interface will be responsible for conducting the background verification process of the driver. It will check for any criminal records, driving history, and other background details.
+#DB Diagram
+https://dbdiagram.io/d/641462db296d97641d88c63a
 
-Shipping API: This API interface will allow the ride management application to ship the tracking device to the driver. It will be responsible for providing the shipping details and tracking information to the driver.
-
-Mark Ready API: This API interface will allow the driver to mark when they are ready to take a ride. It will receive a request from the driver and update the driver's status in the ride management application.
-
-Profile API: This API interface will allow the driver to view and edit their profile information. It will receive a request from the driver and return the driver's profile data in the form of JSON or XML.
-
-Notification API: This API interface will be responsible for sending notifications to the driver regarding their onboarding process. It will send notifications regarding the status of their documents, background verification, and tracking device shipment.
-
-
-
-POST /driver/signup - This API interface will allow the driver to sign up and create a new account by submitting their profile information, such as name, email, phone number, and other relevant details.
-
-POST /driver/documents - This API interface will trigger the document collection process. The driver can submit their identity and vehicle documents to get verified before they can start accepting rides.
-
-POST /driver/backgroundverification - This API interface will initiate the background verification process. We can use third-party services to perform background checks, and this interface will receive the results and update the driver's account status accordingly.
-
-POST /driver/trackingdevice - This API interface will trigger the shipment of the tracking device to the driver's address. This device will help us track the driver's location and other details when they are online.
-
-PUT /driver/availability - This API interface will allow the driver to mark when they are ready to take a ride. They can set their availability status to 'online' or 'offline' as per their preference.
-
-By exposing these API interfaces, we can build a robust driver onboarding module that will enable us to collect the necessary information, verify the driver's credentials, and make them available to accept ride requests.
+#API Details
+APIDocumentation.md
